@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edges xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/edges_file.xsd">
+    <!-- Internal bidirectional edges -->
+    <edge id="A_to_B" from="A" to="B" numLanes="2" speed="13.89"/>
+    <edge id="B_to_A" from="B" to="A" numLanes="2" speed="13.89"/>
+    <edge id="A_to_C" from="A" to="C" numLanes="2" speed="13.89"/>
+    <edge id="C_to_A" from="C" to="A" numLanes="2" speed="13.89"/>
+    <edge id="C_to_D" from="C" to="D" numLanes="2" speed="13.89"/>
+    <edge id="D_to_C" from="D" to="C" numLanes="2" speed="13.89"/>
+    <edge id="B_to_D" from="B" to="D" numLanes="2" speed="13.89"/>
+    <edge id="D_to_B" from="D" to="B" numLanes="2" speed="13.89"/>
+
+    <!-- Boundary edges for Intersection A -->
+    <edge id="north_to_A" from="north_A" to="A" numLanes="2" speed="13.89"/>
+    <edge id="A_to_north" from="A" to="north_A" numLanes="2" speed="13.89"/>
+    <edge id="west_to_A" from="west_A" to="A" numLanes="2" speed="13.89"/>
+    <edge id="A_to_west" from="A" to="west_A" numLanes="2" speed="13.89"/>
+
+    <!-- Boundary edges for Intersection B -->
+    <edge id="north_to_B" from="north_B" to="B" numLanes="2" speed="13.89"/>
+    <edge id="B_to_north" from="B" to="north_B" numLanes="2" speed="13.89"/>
+    <edge id="east_to_B" from="east_B" to="B" numLanes="2" speed="13.89"/>
+    <edge id="B_to_east" from="B" to="east_B" numLanes="2" speed="13.89"/>
+
+    <!-- Boundary edges for Intersection C -->
+    <edge id="west_to_C" from="west_C" to="C" numLanes="2" speed="13.89"/>
+    <edge id="C_to_west" from="C" to="west_C" numLanes="2" speed="13.89"/>
+    <edge id="south_to_C" from="south_C" to="C" numLanes="2" speed="13.89"/>
+    <edge id="C_to_south" from="C" to="south_C" numLanes="2" speed="13.89"/>
+
+    <!-- Boundary edges for Intersection D -->
+    <edge id="south_to_D" from="south_D" to="D" numLanes="2" speed="13.89"/>
+    <edge id="D_to_south" from="D" to="south_D" numLanes="2" speed="13.89"/>
+    <edge id="east_to_D" from="east_D" to="D" numLanes="2" speed="13.89"/>
+    <edge id="D_to_east" from="D" to="east_D" numLanes="2" speed="13.89"/>
+</edges>

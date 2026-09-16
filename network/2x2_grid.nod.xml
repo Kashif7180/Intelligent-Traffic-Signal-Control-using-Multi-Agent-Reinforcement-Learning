@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/nodes_file.xsd">
+    <!-- Signalized Intersections (2x2 Grid) -->
+    <node id="A" x="0.0" y="300.0" type="traffic_light"/>
+    <node id="B" x="300.0" y="300.0" type="traffic_light"/>
+    <node id="C" x="0.0" y="0.0" type="traffic_light"/>
+    <node id="D" x="300.0" y="0.0" type="traffic_light"/>
+
+    <!-- Boundary Portals -->
+    <node id="north_A" x="0.0" y="500.0" type="priority"/>
+    <node id="north_B" x="300.0" y="500.0" type="priority"/>
+    <node id="south_C" x="0.0" y="-200.0" type="priority"/>
+    <node id="south_D" x="300.0" y="-200.0" type="priority"/>
+    <node id="west_A" x="-200.0" y="300.0" type="priority"/>
+    <node id="west_C" x="-200.0" y="0.0" type="priority"/>
+    <node id="east_B" x="500.0" y="300.0" type="priority"/>
+    <node id="east_D" x="500.0" y="0.0" type="priority"/>
+</nodes>
