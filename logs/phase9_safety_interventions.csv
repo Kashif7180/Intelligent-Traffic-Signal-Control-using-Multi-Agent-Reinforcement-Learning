@@ -1,0 +1,1 @@
+sim_time,step,intersection_id,proposed_action,safe_action,active_constraint,reason,green_duration,red_duration

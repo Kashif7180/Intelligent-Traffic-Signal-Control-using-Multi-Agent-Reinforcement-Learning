@@ -229,3 +229,16 @@ phase8r:
     steps_per_episode: 100
     lr_actor: 0.0003
     lr_critic: 0.0005
+
+# Phase 9: Safety Layer Configuration
+safety:
+  enabled: true
+  mode: "shield"                  # "shield" (active intervention) or "audit_only" (passive logging)
+  min_green: 5                    # minimum green duration (seconds) before phase switch allowed
+  max_green: 60                   # maximum green duration (seconds) before phase switch enforced
+  min_red: 5                      # minimum red duration (seconds) required for opposing movement
+  yellow_duration: 3              # yellow clearance duration (seconds)
+  all_red_duration: 1             # all-red clearance duration (seconds)
+  log_interventions: true         # record safety interventions
+  log_file: "logs/phase9_safety_interventions.csv"
+

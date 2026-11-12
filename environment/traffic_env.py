@@ -15,6 +15,7 @@ import traci
 from gymnasium import spaces
 
 from environment.demand_generator import generate_routes
+from models.safety_layer import TrafficSignalSafetyLayer
 
 
 def get_sumo_binary(gui: bool = False) -> str:
@@ -48,15 +49,19 @@ class TrafficSignal:
         min_green: int,
         max_green: int = 60,
         delta_green: int = 5,
-        default_target_green: int = 30
+        default_target_green: int = 30,
+        all_red_duration: int = 0,
+        min_red: int = 5
     ):
         self.ts_id = ts_id
         self.incoming_lanes = incoming_lanes
         self.green_phases = green_phases  # e.g. [0, 2]
         self.yellow_map = yellow_map      # e.g. {0: 1, 2: 3}
         self.yellow_duration = yellow_duration
+        self.all_red_duration = all_red_duration
         self.min_green = min_green
         self.max_green = max_green
+        self.min_red = min_red
         self.delta_green = delta_green
         self.default_target_green = default_target_green
 
@@ -64,9 +69,15 @@ class TrafficSignal:
         self.target_phase = green_phases[0]
         self.is_yellow = False
         self.yellow_timer = 0
+        self.is_all_red = False
+        self.all_red_timer = 0
         self.time_on_phase = 0
         self.target_green_duration = default_target_green
         self.phase_switched_last_step = False
+
+        # Independent movement red duration tracking (seconds)
+        self.red_time_ns = 0
+        self.red_time_ew = self.min_red
 
     def initialize_phase(self):
         """Set initial phase and reset timers in TraCI."""
@@ -74,10 +85,15 @@ class TrafficSignal:
         self.target_phase = self.green_phases[0]
         self.is_yellow = False
         self.yellow_timer = 0
+        self.is_all_red = False
+        self.all_red_timer = 0
         self.time_on_phase = 0
         self.target_green_duration = self.default_target_green
         self.phase_switched_last_step = False
-        traci.trafficlight.setPhase(self.ts_id, self.current_phase)
+        self.red_time_ns = 0
+        self.red_time_ew = self.min_red
+        if traci is not None and traci.isLoaded():
+            traci.trafficlight.setPhase(self.ts_id, self.current_phase)
 
     def _get_alternative_green_phase(self) -> int:
         """Find the other green phase in a 2-phase signal plan."""
@@ -86,10 +102,19 @@ class TrafficSignal:
                 return p
         return self.green_phases[0]
 
+    def _activate_target_green(self):
+        """Transition from clearance directly into target green phase."""
+        self.current_phase = self.target_phase
+        self.time_on_phase = 0
+        self.target_green_duration = self.default_target_green
+        if traci is not None and traci.isLoaded():
+            traci.trafficlight.setPhase(self.ts_id, self.current_phase)
+
     def _initiate_switch(self):
-        """Trigger yellow clearance transition towards the alternative green phase."""
-        if self.is_yellow:
-            return  # Already transitioning
+        """Trigger clearance transition towards the alternative green phase."""
+        # Non-preemptible clearance: do not restart timers if already transitioning
+        if self.is_yellow or self.is_all_red:
+            return
 
         if self.time_on_phase < self.min_green:
             # Cannot switch before minimum green duration has elapsed
@@ -102,12 +127,19 @@ class TrafficSignal:
         if yellow_phase is not None and self.yellow_duration > 0:
             self.is_yellow = True
             self.yellow_timer = self.yellow_duration
-            traci.trafficlight.setPhase(self.ts_id, yellow_phase)
+            self.is_all_red = False
+            self.all_red_timer = 0
+            if traci is not None and traci.isLoaded():
+                traci.trafficlight.setPhase(self.ts_id, yellow_phase)
+        elif self.all_red_duration > 0:
+            self.is_yellow = False
+            self.yellow_timer = 0
+            self.is_all_red = True
+            self.all_red_timer = self.all_red_duration
+            if traci is not None and traci.isLoaded():
+                traci.trafficlight.setRedYellowGreenState(self.ts_id, "r" * 20)
         else:
-            self.current_phase = target_green
-            self.time_on_phase = 0
-            self.target_green_duration = self.default_target_green
-            traci.trafficlight.setPhase(self.ts_id, self.current_phase)
+            self._activate_target_green()
 
         self.phase_switched_last_step = True
 
@@ -115,7 +147,7 @@ class TrafficSignal:
         """
         Apply one of the 4 discrete actions:
         - 0: KEEP (maintain current phase)
-        - 1: SWITCH (switch to opposite green phase via yellow)
+        - 1: SWITCH (switch to opposite green phase via yellow/all-red clearance)
         - 2: EXTEND (increase green allocation by delta_green)
         - 3: REDUCE (decrease green allocation by delta_green; switch if floor met)
         """
@@ -139,21 +171,61 @@ class TrafficSignal:
             raise ValueError(f"Unknown action {action} for agent {self.ts_id}. Expected 0, 1, 2, or 3.")
 
     def update_second(self):
-        """Advance internal timers by 1 simulation second."""
+        """Advance internal timers and clearance state by 1 simulation second."""
+        # 1. Update independent movement red times
+        if self.current_phase == 0:  # Phase 0: NS Green
+            if self.is_yellow:
+                # NS yellow, EW red
+                self.red_time_ns = 0
+                self.red_time_ew += 1
+            elif self.is_all_red:
+                # NS red, EW red
+                self.red_time_ns += 1
+                self.red_time_ew += 1
+            else:
+                # NS green, EW red
+                self.red_time_ns = 0
+                self.red_time_ew += 1
+        elif self.current_phase == 2:  # Phase 2: EW Green
+            if self.is_yellow:
+                # EW yellow, NS red
+                self.red_time_ew = 0
+                self.red_time_ns += 1
+            elif self.is_all_red:
+                # EW red, NS red
+                self.red_time_ns += 1
+                self.red_time_ew += 1
+            else:
+                # EW green, NS red
+                self.red_time_ew = 0
+                self.red_time_ns += 1
+
+        # 2. Advance clearance progression
         if self.is_yellow:
             self.yellow_timer -= 1
             if self.yellow_timer <= 0:
-                # Yellow transition finished -> activate target green phase
                 self.is_yellow = False
-                self.current_phase = self.target_phase
-                self.time_on_phase = 0
-                self.target_green_duration = self.default_target_green
-                traci.trafficlight.setPhase(self.ts_id, self.current_phase)
+                if self.all_red_duration > 0:
+                    self.is_all_red = True
+                    self.all_red_timer = self.all_red_duration
+                    if traci is not None and traci.isLoaded():
+                        traci.trafficlight.setRedYellowGreenState(self.ts_id, "r" * 20)
+                else:
+                    self._activate_target_green()
+        elif self.is_all_red:
+            self.all_red_timer -= 1
+            # Check if all-red duration has elapsed and minimum red requirement satisfied
+            target_red_time = self.red_time_ew if self.target_phase == 2 else self.red_time_ns
+            if self.all_red_timer <= 0 and target_red_time >= self.min_red:
+                self.is_all_red = False
+                self._activate_target_green()
+            # If all_red_timer <= 0 but min_red not yet reached, remain safely in all-red
         else:
             self.time_on_phase += 1
             # Automatic safety switch if max_green ceiling reached
             if self.time_on_phase >= self.max_green:
                 self._initiate_switch()
+
 
     def get_metrics(self) -> Dict[str, Any]:
         """Query TraCI for raw traffic metrics on all incoming lanes."""
@@ -328,7 +400,30 @@ class MultiAgentTrafficEnv:
         self.features = self.obs_cfg["features"]
         self.normalization = {k: float(v) for k, v in self.obs_cfg["normalization"].items()}
 
+        # Phase 9: Safety Layer Configuration
+        self.safety_cfg = self.config.get("safety", {})
+        self.safety_enabled = bool(self.safety_cfg.get("enabled", True))
+        self.safety_mode = str(self.safety_cfg.get("mode", "shield"))
+        self.safety_min_green = int(self.safety_cfg.get("min_green", self.min_green))
+        self.safety_max_green = int(self.safety_cfg.get("max_green", self.max_green))
+        self.safety_min_red = int(self.safety_cfg.get("min_red", 5))
+        self.all_red_duration = int(self.safety_cfg.get("all_red_duration", 1)) if self.safety_enabled else 0
+        self._pending_safety_enabled: Optional[bool] = None
+
+        self.safety_layer = TrafficSignalSafetyLayer(
+            config=self.config,
+            enabled=self.safety_enabled,
+            mode=self.safety_mode,
+            min_green=self.safety_min_green,
+            max_green=self.safety_max_green,
+            min_red=self.safety_min_red,
+            yellow_duration=self.yellow_duration,
+            all_red_duration=self.all_red_duration,
+            intersections=self.agents
+        )
+
         # Action and Observation Spaces per agent
+
         self.action_spaces: Dict[str, spaces.Discrete] = {
             agent_id: spaces.Discrete(4) for agent_id in self.agents
         }
@@ -413,6 +508,15 @@ class MultiAgentTrafficEnv:
         if self.gui:
             sumo_cmd.extend(["--start", "--quit-on-end"])
 
+        # Check for pending safety toggle deferred to episode boundary
+        if self._pending_safety_enabled is not None:
+            self.safety_enabled = self._pending_safety_enabled
+            self.safety_layer.enabled = self._pending_safety_enabled
+            self.all_red_duration = int(self.safety_cfg.get("all_red_duration", 1)) if self.safety_enabled else 0
+            self._pending_safety_enabled = None
+
+        self.safety_layer.reset()
+
         traci.start(sumo_cmd)
         self.is_running = True
         self.current_step = 0
@@ -431,7 +535,9 @@ class MultiAgentTrafficEnv:
                 min_green=self.min_green,
                 max_green=self.max_green,
                 delta_green=self.delta_green,
-                default_target_green=self.default_green_target
+                default_target_green=self.default_green_target,
+                all_red_duration=self.all_red_duration if self.safety_enabled else 0,
+                min_red=self.safety_min_red
             )
             sig.initialize_phase()
             self.signals[ts_id] = sig
@@ -444,7 +550,8 @@ class MultiAgentTrafficEnv:
         infos = {
             agent_id: {
                 "metrics": self.signals[agent_id].get_metrics(),
-                "sim_time": traci.simulation.getTime()
+                "sim_time": traci.simulation.getTime() if (traci is not None and traci.isLoaded()) else 0.0,
+                "safety": self.safety_layer.get_statistics()
             }
             for agent_id in self.agents
         }
@@ -458,12 +565,25 @@ class MultiAgentTrafficEnv:
         """
         Apply discrete actions per agent, advance simulation, and return:
         (observations, rewards, terminations, truncations, infos) all keyed by agent ID.
+        Actions strictly pass through the runtime safety layer before environment application.
         """
         if not self.is_running:
             raise RuntimeError("Simulation is not running. Call reset() before step().")
 
-        # Apply discrete action (0: keep, 1: switch, 2: extend, 3: reduce)
-        for agent_id, action in actions.items():
+        # Pass through unbypassable safety layer
+        current_sim_time = traci.simulation.getTime() if (traci is not None and traci.isLoaded()) else float(self.current_step * self.step_duration)
+        if self.safety_enabled:
+            validated_actions = self.safety_layer.validate_actions(
+                proposed_actions=actions,
+                signals=self.signals,
+                sim_time=current_sim_time,
+                current_step=self.current_step
+            )
+        else:
+            validated_actions = actions
+
+        # Apply validated discrete action (0: keep, 1: switch, 2: extend, 3: reduce)
+        for agent_id, action in validated_actions.items():
             if agent_id in self.signals:
                 self.signals[agent_id].apply_action(action)
 
@@ -471,12 +591,16 @@ class MultiAgentTrafficEnv:
         for _ in range(self.step_duration):
             for sig in self.signals.values():
                 sig.update_second()
-            traci.simulationStep()
+            if traci is not None and traci.isLoaded():
+                traci.simulationStep()
+                if self.safety_enabled:
+                    sec_time = traci.simulation.getTime()
+                    self.safety_layer.audit_all_physical_states(sim_time=sec_time)
 
         self.current_step += 1
 
         # Check termination & truncation
-        sim_ended = traci.simulation.getMinExpectedNumber() <= 0
+        sim_ended = traci.simulation.getMinExpectedNumber() <= 0 if (traci is not None and traci.isLoaded()) else False
         truncated_flag = self.current_step >= self.sim_max_steps
 
         observations = {}
@@ -485,7 +609,7 @@ class MultiAgentTrafficEnv:
         truncations = {}
         infos = {}
 
-        arrived_this_step = traci.simulation.getArrivedNumber()
+        arrived_this_step = traci.simulation.getArrivedNumber() if (traci is not None and traci.isLoaded()) else 0
 
         for agent_id in self.agents:
             sig = self.signals[agent_id]
@@ -496,12 +620,39 @@ class MultiAgentTrafficEnv:
             infos[agent_id] = {
                 "metrics": sig.get_metrics(),
                 "current_step": self.current_step,
-                "sim_time": traci.simulation.getTime(),
-                "active_vehicles": traci.vehicle.getIDCount(),
-                "arrived_vehicles": arrived_this_step
+                "sim_time": traci.simulation.getTime() if (traci is not None and traci.isLoaded()) else float(self.current_step * self.step_duration),
+                "active_vehicles": traci.vehicle.getIDCount() if (traci is not None and traci.isLoaded()) else 0,
+                "arrived_vehicles": arrived_this_step,
+                "safety": self.safety_layer.get_statistics(),
+                "validated_action": validated_actions.get(agent_id, 0),
+                "proposed_action": actions.get(agent_id, 0)
             }
 
         return observations, rewards, terminations, truncations, infos
+
+    def set_safety_enabled(self, enabled: bool) -> bool:
+        """
+        Safely toggle runtime safety shielding.
+        Requirement: Safety cannot be disabled during an active yellow/all-red transition.
+        If any intersection is transitioning, the change is deferred to next episode reset.
+        Returns True if immediately applied, False if deferred to episode boundary.
+        """
+        if not enabled and self.is_running:
+            any_transition = any(
+                (sig.is_yellow or getattr(sig, "is_all_red", False))
+                for sig in self.signals.values()
+            )
+            if any_transition:
+                self._pending_safety_enabled = enabled
+                return False
+
+        self.safety_enabled = enabled
+        self.safety_layer.enabled = enabled
+        self.all_red_duration = int(self.safety_cfg.get("all_red_duration", 1)) if enabled else 0
+        for sig in self.signals.values():
+            sig.all_red_duration = self.all_red_duration if enabled else 0
+        return True
+
 
     def get_intersection_metrics(self, intersection_id: str) -> Dict[str, Any]:
         """Get raw metrics for a specific intersection."""

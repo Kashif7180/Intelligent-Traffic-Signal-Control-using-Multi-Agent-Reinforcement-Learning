@@ -126,6 +126,7 @@ def run_evaluation():
                 ep_actual_comm = 0
                 ep_possible_comm = steps_per_episode * len(ALLOWED_DIRECTED_EDGES)  # 800
                 step_c_scores = []
+                ep_throughput = 0
 
                 for step in range(steps_per_episode):
                     if is_phase8:
@@ -177,6 +178,7 @@ def run_evaluation():
 
                     # Advance environment
                     next_obs, task_rewards, terminations, truncations, next_info = env.step(actions)
+                    ep_throughput += next_info[env.agents[0]]["arrived_vehicles"]
 
                     for a in env.agents:
                         ep_task_rewards[a] += task_rewards[a]
@@ -191,7 +193,6 @@ def run_evaluation():
                     obs = next_obs
                     info = next_info
 
-                ep_throughput = sum(info[a]["metrics"]["vehicle_count"] for a in env.agents) // 4
                 task_ret = float(sum(ep_task_rewards.values()))
                 total_comm_cost = float(sum(ep_comm_costs.values()))
                 adj_ret = task_ret - total_comm_cost
