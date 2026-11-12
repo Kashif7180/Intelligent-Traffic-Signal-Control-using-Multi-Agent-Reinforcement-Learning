@@ -7,7 +7,23 @@ and multi-objective delay + queue reward functions.
 
 import os
 import sys
+
+# Ensure SUMO_HOME is set before importing traci/sumolib
+if "SUMO_HOME" not in os.environ:
+    for candidate in [
+        r"C:\Program Files (x86)\SUMO",
+        r"C:\Program Files\SUMO",
+        r"C:\Program Files (x86)\Eclipse\Sumo",
+        r"C:\Program Files\Eclipse\Sumo",
+        r"D:\Program Files (x86)\SUMO",
+        r"D:\Program Files\SUMO",
+    ]:
+        if os.path.exists(candidate):
+            os.environ["SUMO_HOME"] = candidate
+            break
+
 import yaml
+
 import numpy as np
 from typing import Dict, Any, Tuple, Optional, List
 import sumolib
@@ -25,11 +41,16 @@ def get_sumo_binary(gui: bool = False) -> str:
     # 1. Check explicit standard Windows installation directories
     candidate_dirs = [
         os.environ.get("SUMO_HOME"),
+        r"C:\Program Files (x86)\SUMO",
+        r"C:\Program Files\SUMO",
         r"C:\Program Files (x86)\Eclipse\Sumo",
         r"C:\Program Files\Eclipse\Sumo",
+        r"D:\Program Files (x86)\SUMO",
+        r"D:\Program Files\SUMO",
         r"D:\Program Files (x86)\Eclipse\Sumo",
         r"D:\Program Files\Eclipse\Sumo",
     ]
+
     for c_dir in candidate_dirs:
         if c_dir and os.path.exists(c_dir):
             exe_path = os.path.join(c_dir, "bin", f"{bin_name}.exe")
@@ -117,6 +138,11 @@ class TrafficSignal:
         self.red_time_ns = 0
         self.red_time_ew = self.min_red
         if traci is not None and traci.isLoaded():
+            try:
+                if traci.trafficlight.getProgram(self.ts_id) != "0":
+                    traci.trafficlight.setProgram(self.ts_id, "0")
+            except Exception:
+                pass
             traci.trafficlight.setPhase(self.ts_id, self.current_phase)
 
     def _get_alternative_green_phase(self) -> int:
@@ -132,7 +158,13 @@ class TrafficSignal:
         self.time_on_phase = 0
         self.target_green_duration = self.default_target_green
         if traci is not None and traci.isLoaded():
+            try:
+                if traci.trafficlight.getProgram(self.ts_id) != "0":
+                    traci.trafficlight.setProgram(self.ts_id, "0")
+            except Exception:
+                pass
             traci.trafficlight.setPhase(self.ts_id, self.current_phase)
+
 
     def _initiate_switch(self):
         """Trigger clearance transition towards the alternative green phase."""

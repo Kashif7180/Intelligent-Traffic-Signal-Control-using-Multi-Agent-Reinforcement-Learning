@@ -153,21 +153,22 @@ Under identical 10-seed evaluation conditions ($100$ decision steps / $500\text{
 
 | Metric | Phase 4 (Frozen MAPPO) | Phase 8R (Unshielded Baseline) | Phase 9 (Runtime Shielded) |
 |---|---|---|---|
-| **Average Delay (s)** | $28.69 \pm 3.74$ | $28.69 \pm 3.74$ | $28.94 \pm 3.65$ |
-| **Average Queue (veh)** | $7.87 \pm 0.93$ | $7.87 \pm 0.93$ | $7.92 \pm 0.91$ |
-| **Throughput (veh)** | $107.0 \pm 8.6$ | $107.0 \pm 8.6$ | $106.8 \pm 8.5$ |
-| **Task Return** | $-899.4 \pm 109.8$ | $-899.4 \pm 109.8$ | $-904.2 \pm 105.4$ |
+| **Average Delay (s)** | $28.40 \pm 3.29$ | $28.40 \pm 3.29$ | $37.15 \pm 3.44$ |
+| **Average Queue (veh)** | $7.76 \pm 0.86$ | $7.76 \pm 0.86$ | $9.51 \pm 0.91$ |
+| **Throughput (veh)** | $104.6 \pm 8.0$ | $104.6 \pm 8.0$ | $89.5 \pm 7.9$ |
+| **Task Return** | $-882.4 \pm 99.5$ | $-882.4 \pm 99.5$ | $-1127.4 \pm 104.3$ |
 | **Communication Ratio (%)** | $0.0\%$ | $0.0\%$ | $0.0\%$ |
-| **Average Interventions / Ep** | $0$ (Unshielded) | $0$ (Unshielded) | $6.2 \pm 1.4$ |
-| **Physical Violations** | $0$ | $0$ | **$0$ (100% Safe)** |
+| **Average Interventions / Ep** | $0$ (Unshielded) | $0$ (Unshielded) | $200.0$ / episode |
+| **Physical Violations** | $0$ | $0$ | **$0$ (100% Confirmed Safe)** |
 
 ### 6.2 Backward Compatibility & Exact Reproduction
 
-When `safety.enabled: false`, the runtime shield is bypassed and `TrafficSignal` runs without the all-red clearance extension, exactly reproducing the frozen Phase 8R baseline:
-- Seed 1001 Mean Delay: $36.6975\text{s}$ (Identical to 4 decimal places)
-- Seed 1001 Mean Queue: $8.7500\text{ veh}$ (Identical to 4 decimal places)
-- Seed 1001 Throughput: $112\text{ vehicles}$ (Identical)
-- Seed 1001 Task Return: $-1087.9500$ (Identical to 4 decimal places)
+When `safety.enabled: false`, the runtime shield is bypassed and `TrafficSignal` runs without the all-red clearance extension, reproducing the frozen Phase 8R baseline:
+- Seed 1001 Mean Delay: $34.18\text{s}$ (Identical between Phase 4 and Phase 8R)
+- Seed 1001 Mean Queue: $8.67\text{ veh}$ (Identical between Phase 4 and Phase 8R)
+- Seed 1001 Throughput: $112\text{ vehicles}$ (Identical between Phase 4 and Phase 8R)
+- Seed 1001 Task Return: $-1034.45$ (Identical between Phase 4 and Phase 8R)
+
 
 ---
 
