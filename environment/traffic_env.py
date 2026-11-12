@@ -19,17 +19,41 @@ from models.safety_layer import TrafficSignalSafetyLayer
 
 
 def get_sumo_binary(gui: bool = False) -> str:
-    """Resolve sumo or sumo-gui binary path."""
+    """Resolve sumo or sumo-gui binary path across system and standard install directories."""
     bin_name = "sumo-gui" if gui else "sumo"
+
+    # 1. Check explicit standard Windows installation directories
+    candidate_dirs = [
+        os.environ.get("SUMO_HOME"),
+        r"C:\Program Files (x86)\Eclipse\Sumo",
+        r"C:\Program Files\Eclipse\Sumo",
+        r"D:\Program Files (x86)\Eclipse\Sumo",
+        r"D:\Program Files\Eclipse\Sumo",
+    ]
+    for c_dir in candidate_dirs:
+        if c_dir and os.path.exists(c_dir):
+            exe_path = os.path.join(c_dir, "bin", f"{bin_name}.exe")
+            if os.path.exists(exe_path):
+                return exe_path
+
+    # 2. Check via sumolib / PATH
     try:
         return sumolib.checkBinary(bin_name)
     except Exception:
+        pass
+
+    # 3. Fallback to pip package location
+    try:
         import sumo
         sumo_dir = os.path.dirname(sumo.__file__)
         exe_path = os.path.join(sumo_dir, "bin", f"{bin_name}.exe")
         if os.path.exists(exe_path):
             return exe_path
-        raise FileNotFoundError(f"Could not locate binary: {bin_name}")
+    except Exception:
+        pass
+
+    raise FileNotFoundError(f"Could not locate binary: {bin_name}")
+
 
 
 class TrafficSignal:

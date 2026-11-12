@@ -325,3 +325,4 @@ class TrafficSignalSafetyLayer:
                 "all_red_duration": self.all_red_duration,
             }
         }
+
