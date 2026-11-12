@@ -45,7 +45,8 @@ class Phase9SafetyGUIDashboard:
         seed: int = 1001,
         max_steps: int = 100,
         step_delay: float = 0.20,
-        use_sumo_gui: bool = False
+        use_sumo_gui: bool = True,
+        auto_run: bool = False
     ):
         self.root = root
         self.config_path = config_path
@@ -53,6 +54,7 @@ class Phase9SafetyGUIDashboard:
         self.max_steps = max_steps
         self.step_delay = step_delay
         self.use_sumo_gui = use_sumo_gui
+        self.auto_run = auto_run
 
         self.root.title("SAGE-Traffic Phase 9: Runtime Safety Shield & Signal Control Dashboard")
         self.root.geometry("1480x920")
@@ -75,6 +77,9 @@ class Phase9SafetyGUIDashboard:
         # Build GUI Layout
         self._build_ui()
 
+        if self.auto_run:
+            self.root.after(500, self._start_sim)
+
     def _init_backend(self):
         with open(self.config_path, "r") as f:
             self.config = yaml.safe_load(f)
@@ -88,6 +93,8 @@ class Phase9SafetyGUIDashboard:
 
         self.obs, self.info = self.env.reset(seed=self.seed)
         self.controller.reset_history(self.obs, self.info)
+        self._logged_intervention_count = 0
+
 
     def _build_ui(self):
         # 1. Header & Control Bar
@@ -282,30 +289,36 @@ class Phase9SafetyGUIDashboard:
 
         # Telemetry Labels
         details = tk.Frame(card, bg="#313244")
-        details.pack(fill=tk.X, pady=3)
+        details.pack(fill=tk.X, pady=2)
 
-        dur_lbl = tk.Label(details, text="Green: 0s / 30s | Opposing Red: 5s", font=("Helvetica", 9), fg="#bac2de", bg="#313244")
-        dur_lbl.pack(anchor="w")
-        card.dur_lbl = dur_lbl
+        eval_lbl = tk.Label(details, text="Decision State: Green 0s (min 5s)", font=("Helvetica", 8, "italic"), fg="#bac2de", bg="#313244")
+        eval_lbl.pack(anchor="w")
+        card.eval_lbl = eval_lbl
 
         # Action Shield Box
-        act_box = tk.Frame(card, bg="#181825", padx=8, pady=6, relief=tk.GROOVE, bd=1)
-        act_box.pack(fill=tk.X, pady=5)
+        act_box = tk.Frame(card, bg="#181825", padx=8, pady=4, relief=tk.GROOVE, bd=1)
+        act_box.pack(fill=tk.X, pady=3)
 
-        p_lbl = tk.Label(act_box, text="Proposed Action: KEEP", font=("Helvetica", 9), fg="#89b4fa", bg="#181825")
+        p_lbl = tk.Label(act_box, text="Proposed Action: KEEP", font=("Helvetica", 8), fg="#89b4fa", bg="#181825")
         p_lbl.pack(anchor="w")
         card.p_lbl = p_lbl
 
-        s_lbl = tk.Label(act_box, text="Shielded Action: KEEP", font=("Helvetica", 9, "bold"), fg="#a6e3a1", bg="#181825")
+        s_lbl = tk.Label(act_box, text="Shielded Action: KEEP", font=("Helvetica", 8, "bold"), fg="#a6e3a1", bg="#181825")
         s_lbl.pack(anchor="w")
         card.s_lbl = s_lbl
 
+        # Post-step physical state label
+        post_lbl = tk.Label(card, text="Step Outcome: Initializing", font=("Helvetica", 8, "bold"), fg="#cdd6f4", bg="#313244")
+        post_lbl.pack(anchor="w", pady=(2, 0))
+        card.post_lbl = post_lbl
+
         # Traffic metrics
         q_lbl = tk.Label(card, text="Queue: 0 veh | Wait: 0.0s", font=("Helvetica", 8), fg="#a6adc8", bg="#313244")
-        q_lbl.pack(anchor="w", pady=(2, 0))
+        q_lbl.pack(anchor="w", pady=(1, 0))
         card.q_lbl = q_lbl
 
         return card
+
 
     def _toggle_safety_shield(self):
         new_state = not self.safety_enabled
@@ -342,11 +355,12 @@ class Phase9SafetyGUIDashboard:
         self.sim_time = 0.0
         self.total_task_return = 0.0
         self.ep_throughput = 0
+        self._logged_intervention_count = 0
         self.obs, self.info = self.env.reset(seed=self.seed)
         self.controller.reset_history(self.obs, self.info)
         for item in self.log_tree.get_children():
             self.log_tree.delete(item)
-        self._update_ui_state({})
+        self._update_ui_state({}, None)
 
     def _single_step(self):
         self._execute_step()
@@ -362,6 +376,20 @@ class Phase9SafetyGUIDashboard:
         if self.step_idx >= self.max_steps:
             return
 
+        # 1. Capture pre-step signal state and time_on_phase before env.step()
+        pre_step_state = {}
+        for a in self.env.agents:
+            sig = self.env.signals[a]
+            pre_step_state[a] = {
+                "phase": sig.current_phase,
+                "phase_name": "NS GREEN" if sig.current_phase == 0 else "EW GREEN",
+                "time_on_phase": sig.time_on_phase,
+                "is_yellow": sig.is_yellow,
+                "is_all_red": getattr(sig, "is_all_red", False),
+                "target_duration": sig.target_green_duration,
+                "opposing_red": getattr(sig, "red_time_ew", 0) if sig.current_phase == 0 else getattr(sig, "red_time_ns", 0)
+            }
+
         context = self.controller.compute_causal_context(self.info)
         actions, log_probs, comm_costs, actual_comm = self.controller.get_actions(context, deterministic=True)
 
@@ -376,9 +404,9 @@ class Phase9SafetyGUIDashboard:
         self.obs = next_obs
         self.info = next_info
 
-        self._update_ui_state(next_info)
+        self._update_ui_state(next_info, pre_step_state)
 
-    def _update_ui_state(self, next_info):
+    def _update_ui_state(self, next_info, pre_step_state=None):
         # Update bottom strip
         self.bottom_labels["Step"].config(text=f"{self.step_idx}/{self.max_steps}")
         self.bottom_labels["Sim Time"].config(text=f"{self.sim_time:.1f}s")
@@ -401,47 +429,100 @@ class Phase9SafetyGUIDashboard:
             self.stat_labels["Clearance Clamped"].config(text=str(by_c.get("CLEARANCE_ACTIVE", 0)))
             self.stat_labels["Physical Conflicts"].config(text=f"{safety_stats.get('audit_physical_violations', 0)} (0%)")
 
+            # Update Intervention Log Treeview without duplication
+            if hasattr(self.env, "safety_layer"):
+                all_interventions = self.env.safety_layer.recent_interventions
+                if len(all_interventions) > self._logged_intervention_count:
+                    new_entries = all_interventions[self._logged_intervention_count:]
+                    for entry in new_entries:
+                        sim_t = f"{entry['sim_time']:.0f}s"
+                        agt = entry['intersection_id']
+                        prop = ACTION_NAMES.get(entry['proposed_action'], str(entry['proposed_action']))
+                        safe = ACTION_NAMES.get(entry['safe_action'], str(entry['safe_action']))
+                        constraint = entry['active_constraint']
+                        self.log_tree.insert("", 0, values=(sim_t, agt, prop, safe, constraint))
+                    self._logged_intervention_count = len(all_interventions)
+
+                    # Keep treeview readable by trimming to recent 100 rows
+                    children = self.log_tree.get_children()
+                    if len(children) > 100:
+                        for extra in children[100:]:
+                            self.log_tree.delete(extra)
+
             # Update Intersection Cards
-            for a in self.env.agents:
-                card = self.cards[a]
-                sig = self.env.signals[a]
-                phase_name = "NS GREEN" if sig.current_phase == 0 else "EW GREEN"
-                if sig.is_yellow:
-                    phase_name = "CLEARANCE (YELLOW)"
-                    card.status_lbl.config(text=phase_name, fg="#f9e2af")
-                elif getattr(sig, "is_all_red", False):
-                    phase_name = "CLEARANCE (ALL-RED)"
-                    card.status_lbl.config(text=phase_name, fg="#f38ba8")
-                else:
-                    card.status_lbl.config(text=phase_name, fg="#a6e3a1")
+            if pre_step_state:
+                for a in self.env.agents:
+                    card = self.cards[a]
+                    sig = self.env.signals[a]
+                    pre = pre_step_state[a]
 
-                opp_red = getattr(sig, "red_time_ew", 0) if sig.current_phase == 0 else getattr(sig, "red_time_ns", 0)
-                card.dur_lbl.config(
-                    text=f"Green: {sig.time_on_phase}s / {sig.target_green_duration}s | Opposing Red: {opp_red}s"
-                )
+                    # 1. Decision-time evaluation display (evaluated against pre-step green timer)
+                    card.eval_lbl.config(
+                        text=f"Decision State: {pre['phase_name']} at {pre['time_on_phase']}s (min {self.env.min_green}s) | Opp Red: {pre['opposing_red']}s"
+                    )
 
-                prop_a = next_info[a].get("proposed_action", 0)
-                val_a = next_info[a].get("validated_action", 0)
-                p_name = ACTION_NAMES.get(prop_a, "UNKNOWN")
-                v_name = ACTION_NAMES.get(val_a, "UNKNOWN")
+                    prop_a = next_info[a].get("proposed_action", 0)
+                    val_a = next_info[a].get("validated_action", 0)
+                    p_name = ACTION_NAMES.get(prop_a, "UNKNOWN")
+                    v_name = ACTION_NAMES.get(val_a, "UNKNOWN")
 
-                card.p_lbl.config(text=f"Proposed Action: {p_name} ({prop_a})")
-                if prop_a != val_a:
-                    card.s_lbl.config(text=f"Shielded Action: {v_name} ({val_a}) [INTERVENED]", fg="#fab387")
-                else:
-                    card.s_lbl.config(text=f"Validated Action: {v_name} ({val_a}) [SAFE]", fg="#a6e3a1")
+                    card.p_lbl.config(text=f"Proposed Action: {p_name} ({prop_a})")
+                    if prop_a != val_a:
+                        card.s_lbl.config(text=f"Shielded Action: {v_name} ({val_a}) [INTERVENED: CLAMPED]", fg="#fab387")
+                    else:
+                        card.s_lbl.config(text=f"Validated Action: {v_name} ({val_a}) [SAFE]", fg="#a6e3a1")
 
-                q = next_info[a]["metrics"]["queue_length"]
-                w = next_info[a]["metrics"]["waiting_time"]
-                card.q_lbl.config(text=f"Queue: {q:.1f} veh | Wait: {w:.1f}s")
+                    # 2. Post-step physical state display
+                    post_phase_name = "NS GREEN" if sig.current_phase == 0 else "EW GREEN"
+                    if sig.is_yellow:
+                        card.status_lbl.config(text="CLEARANCE (YELLOW)", fg="#f9e2af")
+                        card.post_lbl.config(text=f"Step Outcome: Active Yellow Clearance (timer: {sig.yellow_timer}s)", fg="#f9e2af")
+                    elif getattr(sig, "is_all_red", False):
+                        card.status_lbl.config(text="CLEARANCE (ALL-RED)", fg="#f38ba8")
+                        card.post_lbl.config(text=f"Step Outcome: Active All-Red Clearance (timer: {sig.all_red_timer}s)", fg="#f38ba8")
+                    else:
+                        card.status_lbl.config(text=post_phase_name, fg="#a6e3a1")
+                        if sig.current_phase != pre["phase"]:
+                            card.post_lbl.config(
+                                text=f"Step Outcome: Switched to {post_phase_name} (New Green: {sig.time_on_phase}s)",
+                                fg="#89b4fa"
+                            )
+                        else:
+                            card.post_lbl.config(
+                                text=f"Step Outcome: Maintained {post_phase_name} (Total Green: {sig.time_on_phase}s)",
+                                fg="#cdd6f4"
+                            )
+
+                    q = next_info[a]["metrics"]["queue_length"]
+                    w = next_info[a]["metrics"]["waiting_time"]
+                    card.q_lbl.config(text=f"Queue: {q:.1f} veh | Wait: {w:.1f}s")
 
 
-def main():
+
+def run_gui():
+    parser = argparse.ArgumentParser(description="Live SUMO-GUI & Safety Dashboard for Phase 9")
+    parser.add_argument("--config", default="config.yaml", help="Path to config.yaml")
+    parser.add_argument("--seed", type=int, default=1001, help="Evaluation seed (default: 1001)")
+    parser.add_argument("--steps", type=int, default=100, help="Max decision steps (default: 100)")
+    parser.add_argument("--delay", type=float, default=0.20, help="Step delay in seconds (default: 0.20)")
+    parser.add_argument("--no-gui", action="store_true", help="Disable SUMO-GUI window (dashboard only)")
+    parser.add_argument("--auto-run", action="store_true", help="Automatically start simulation")
+    args = parser.parse_args()
+
     root = tk.Tk()
-    app = Phase9SafetyGUIDashboard(root)
+    app = Phase9SafetyGUIDashboard(
+        root=root,
+        config_path=args.config,
+        seed=args.seed,
+        max_steps=args.steps,
+        step_delay=args.delay,
+        use_sumo_gui=not args.no_gui,
+        auto_run=args.auto_run
+    )
     root.mainloop()
 
 
 if __name__ == "__main__":
-    main()
+    run_gui()
+
 

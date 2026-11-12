@@ -12,18 +12,23 @@
 
 Phase 9 establishes a **provably safe, unbypassable runtime safety layer** interposed between the multi-agent reinforcement learning (MARL) policy and the microscopic SUMO traffic simulation environment.
 
-Prior to Phase 9, the Phase 8R causal communication policy proposed actions ($a_i \in \{\text{KEEP, SWITCH, EXTEND, REDUCE}\}$) directly to intersection signal heads. While Phase 8R achieved optimal communication efficiency ($0.0\%$ communication overhead via causal gating), deep RL policies lack hard formal guarantees and can theoretically propose abrupt phase switches, violate pedestrian or vehicular clearance requirements, or oscillate under distribution shifts.
+Prior to Phase 9, the Phase 8R causal communication policy proposed actions ($a_i \in \{\text{KEEP, SWITCH, EXTEND, REDUCE}\}$) directly to intersection signal heads. While Phase 8R achieved optimal communication efficiency ($0.0\%$ communication overhead via causal gating), deep RL policies lack hard formal safety guarantees and can theoretically propose abrupt phase switches, violate vehicular or pedestrian clearance intervals, or oscillate under distribution shifts.
 
 Phase 9 resolves this by implementing a **deterministic runtime safety shield** and an **augmented physical clearance state machine**:
 1. **Unbypassable Boundary Enforcement**: Actions submitted to `MultiAgentTrafficEnv.step()` are intercepted and validated *before* reaching physical intersection controllers.
-2. **Clearance State Machine**: Replaces instantaneous green-to-green transitions with non-preemptible $\text{Yellow (3s)} \to \text{All-Red (1s)} \to \text{Target Green}$ clearance sequences.
+2. **Clearance State Machine**: Replaces instantaneous green-to-green transitions with non-preemptible $\text{Yellow (3s)} \to \text{All-Red (1s)} \to \text{Target Green}$ clearance sequences, ensuring intersections are completely evacuated prior to cross-street activation.
 3. **Five Configurable Safety Invariants**:
    - Minimum Green Time ($T_{\text{green}} \ge 5\text{s}$)
    - Maximum Green Time ($T_{\text{green}} \le 60\text{s}$)
    - Minimum Red Time for Opposing Movements ($T_{\text{red}} \ge 5\text{s}$)
    - Clearance Protection (Zero interruption during yellow or all-red phases)
    - Zero Physical Conflict Guarantee ($\text{NS Green} \cap \text{EW Green} = \emptyset$)
-4. **100% Invariant Pass Rate**: All 15 unit tests and 6 forensic audit items passed with zero errors.
+4. **Empirical Performance & Runtime Safety Trade-off**:
+   - Evaluated across 10 evaluation seeds (1001–1010):
+     - Unshielded Phase 8R Baseline: Delay $28.40 \pm 3.29\text{s}$, Queue $7.76 \pm 0.86\text{ veh}$, Throughput $104.6 \pm 8.0\text{ veh}$.
+     - Runtime Shielded Phase 9: Delay $37.15 \pm 3.44\text{s}$, Queue $9.51 \pm 0.91\text{ veh}$, Throughput $89.5 \pm 7.9\text{ veh}$.
+   - Enforcing rigorous clearance introduces a **$+30.8\%$ delay increase** and a **$-14.4\%$ throughput reduction**. This performance trade-off arises directly from the mandatory 1-second all-red intersection evacuation interval (50 cumulative seconds of total vehicular halt per 500s episode) coupled with the frozen policy's frequent switching proposals.
+   - Across the 10 evaluation episodes, **20,000 actual SUMO signal states** were audited second-by-second using TraCI `getRedYellowGreenState()`, demonstrating **zero (0) physical conflicting movements (100% formal safety)**.
 5. **Exact Reproduction Contract**: When `safety.enabled: false`, the environment reproduces frozen Phase 8R baseline metrics on Seed 1001 to 4 decimal places.
 
 ---
@@ -129,7 +134,7 @@ Because the link sets are strictly disjoint, the physical topology permits confl
 
 ### 5.2 Second-by-Second Physical State Audit
 
-The safety audit function `TrafficSignalSafetyLayer.audit_physical_state()` inspects the exact 20-character phase string at every simulation second.
+The safety audit function `TrafficSignalSafetyLayer.audit_physical_state()` inspects the exact 20-character phase string at every simulation second via TraCI `traci.trafficlight.getRedYellowGreenState()`.
 
 Audited Phase Strings:
 - Phase 0: `"GGGggrrrrrGGGggrrrrr"` $\implies$ NS Green, EW Red (0 conflicting links)
@@ -141,7 +146,8 @@ Audited Phase Strings:
 **Audit Findings**:
 - Defined SUMO phases audited: **5 / 5 conflict-free**.
 - Synthetic conflicting state test (`"GGGggrrrrrrrrrrGGGgg"`): **Correctly intercepted and flagged**.
-- Total physical violations detected: **0 across all valid states**.
+- Empirical runtime state auditing across seeds 1001–1010: **Exactly 20,000 physical intersection-seconds** (4 intersections $\times$ 500s $\times$ 10 episodes) were audited live in SUMO.
+- Total physical violations detected: **0 across all 20,000 audited states (100% formal safety confirmed)**.
 
 ---
 
@@ -161,7 +167,30 @@ Under identical 10-seed evaluation conditions ($100$ decision steps / $500\text{
 | **Average Interventions / Ep** | $0$ (Unshielded) | $0$ (Unshielded) | $200.0$ / episode |
 | **Physical Violations** | $0$ | $0$ | **$0$ (100% Confirmed Safe)** |
 
-### 6.2 Backward Compatibility & Exact Reproduction
+### 6.2 Empirical Performance Analysis & Trade-off Disclosures
+
+The 10-seed empirical evaluation reveals clear, rigorous insights into the trade-off between unconstrained MARL policies and formally shielded control:
+
+1. **Delay & Throughput Trade-off**:
+   - **Average Delay**: Increased from $28.40\text{s}$ to $37.15\text{s}$ (**$+30.8\%$ delay increase**).
+   - **Average Queue Length**: Increased from $7.76\text{ veh}$ to $9.51\text{ veh}$ (**$+22.6\%$ queue increase**).
+   - **Throughput**: Decreased from $104.6\text{ veh}$ to $89.5\text{ veh}$ (**$-14.4\%$ throughput reduction**).
+   - **Cumulative Task Return**: Decreased from $-882.4$ to $-1127.4$.
+
+2. **Root Cause: Physical Clearance Dynamics**:
+   - In unshielded Phase 8R, phase transitions only executed a 3-second yellow clearance.
+   - In Phase 9, every phase switch strictly enforces a **non-preemptible 3-second yellow clearance followed by a 1-second all-red intersection evacuation clearance** (total 4 seconds of clearance).
+   - The frozen Phase 8R policy was trained to aggressively alternate green phases, proposing `SWITCH (1)` on virtually every decision step.
+   - Under this switching frequency, every complete phase switch consumes 4 seconds of lost time. Across 50 switching cycles per 500-second episode, this introduces **50 seconds of cumulative intersection dead time (10% of total simulation time)** where traffic in all directions is completely halted to ensure safe clearance. This physical clearance dead time directly accounts for the throughput reduction and increased queue latency.
+
+3. **Intervention Mechanism & Frequency (200 Interventions / Episode)**:
+   - Each episode comprises 100 decision steps across 4 intersections, yielding **400 total action proposals per episode**.
+   - On odd-numbered decision steps (steps 1, 3, 5, ...), the active green phase has persisted for 5s to 6s ($T_{\text{green}} \ge T_{\text{min\_green}}$). The policy proposes `SWITCH`, which is permitted by the shield.
+   - Following this switch and the subsequent 4s clearance, the newly activated green phase has elapsed for only **1 second** at the next decision step (even steps 2, 4, 6, ...).
+   - On even steps, the frozen policy again proposes `SWITCH`, but the safety shield intercepts the action because $T_{\text{green}} = 1\text{s} < 5\text{s}$ (`MIN_GREEN` invariant). The proposed `SWITCH` is clamped to `KEEP`.
+   - As a result, the shield intervenes on all 4 agents on all 50 even steps: $50 \times 4 = \mathbf{200\text{ interventions per episode}}$ (exactly 50% of all proposed actions). All 200 interventions are strictly `MIN_GREEN` enforcements protecting newly activated greens from premature truncation.
+
+### 6.3 Backward Compatibility & Exact Reproduction
 
 When `safety.enabled: false`, the runtime shield is bypassed and `TrafficSignal` runs without the all-red clearance extension, reproducing the frozen Phase 8R baseline:
 - Seed 1001 Mean Delay: $34.18\text{s}$ (Identical between Phase 4 and Phase 8R)
@@ -169,20 +198,20 @@ When `safety.enabled: false`, the runtime shield is bypassed and `TrafficSignal`
 - Seed 1001 Throughput: $112\text{ vehicles}$ (Identical between Phase 4 and Phase 8R)
 - Seed 1001 Task Return: $-1034.45$ (Identical between Phase 4 and Phase 8R)
 
-
 ---
 
 ## 7. Retraining Assessment & Technical Decision
 
-### Technical Decision: NO RETRAINING REQUIRED
+### Technical Decision: NO RETRAINING REQUIRED (PHASE 9 COMPLETED AS RUNTIME SHIELD)
 
-**Justification**:
-1. **Zero Policy Degradation**: The runtime shield intervenes only at boundary conditions (e.g. attempting to switch during clearance or at $<5\text{s}$ green). Nominal traffic metrics (Delay $28.94\text{s}$ vs $28.69\text{s}$, Queue $7.92$ vs $7.87$) differ by less than $0.9\%$, which is within standard stochastic deviation.
-2. **Stable Throughput**: Episode throughput remains preserved at $106.8 \pm 8.5$ vehicles ($99.8\%$ of unshielded throughput).
-3. **Zero Policy Distribution Shift**: The Phase 8R policy was already trained with $5\text{s}$ decision intervals matching `min_green`. Interventions occur almost exclusively during clearance lockout phases, where actions should safely default to `KEEP`.
-4. **Preservation of Causal Gating**: Communication ratio remains optimal at $0.0\%$, with zero unneeded inter-agent messages.
+**Evaluation & Rationale**:
+1. **Runtime Safety Primacy**: Phase 9's core mission is to establish a non-bypassable runtime safety shield that guarantees physical invariants regardless of the upstream policy. The safety layer successfully audited 20,000 live intersection-seconds with zero physical conflicts or clearance violations. Phase 9 deliberately prioritizes provable physical safety over raw traffic efficiency in this frozen-policy baseline evaluation.
+2. **Predictable Policy Interaction**: The $-14.4\%$ throughput reduction and $+30.8\%$ delay increase are not bugs or policy failures; they represent the authentic physical cost of enforcing realistic yellow (3s) and all-red (1s) clearance intervals on an aggressive policy that was trained in an idealized environment with zero all-red clearance.
+3. **Shield Correctness Guaranteed**: The safety layer operates as a closed-loop projection operator $\Pi_{\mathcal{S}}(a_t)$. It reliably clamps illegal switches to `KEEP` and forces overdue phases to `SWITCH`, ensuring that unconstrained or miscalibrated policy outputs cannot create unsafe physical traffic states.
+4. **Preservation of Baselines**: Retraining the policy at this stage would conflate policy adaptation with safety shield verification, altering the frozen Phase 8R checkpoint. By keeping Phase 8R frozen, the exact safety degradation delta ($28.40\text{s} \to 37.15\text{s}$) is cleanly isolated and scientifically documented.
+5. **Causal Gating Remains Optimal**: The causal communication gating mechanism continues to operate with $0.0\%$ communication overhead.
 
-Therefore, retraining the policy from scratch would introduce unnecessary compute overhead without improving safety or throughput.
+Therefore, the frozen Phase 8R checkpoint is preserved intact, and Phase 9 is completed without retraining.
 
 ---
 
