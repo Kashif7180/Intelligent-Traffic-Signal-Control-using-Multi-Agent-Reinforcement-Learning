@@ -29,26 +29,7 @@ import torch
 import torch.nn as nn
 from typing import Dict, List, Tuple, Optional, Any
 
-
-# Exactly 8 allowed physical directed inter-agent communication channels
-ALLOWED_DIRECTED_EDGES: List[Tuple[str, str]] = [
-    ("A", "B"), ("B", "A"),
-    ("A", "C"), ("C", "A"),
-    ("B", "D"), ("D", "B"),
-    ("C", "D"), ("D", "C")
-]
-
-# Physical corridor incoming lane mapping at target from source
-CORRIDOR_INCOMING_LANES: Dict[Tuple[str, str], List[str]] = {
-    ("A", "B"): ["A_to_B_0", "A_to_B_1"],
-    ("B", "A"): ["B_to_A_0", "B_to_A_1"],
-    ("A", "C"): ["A_to_C_0", "A_to_C_1"],
-    ("C", "A"): ["C_to_A_0", "C_to_A_1"],
-    ("B", "D"): ["B_to_D_0", "B_to_D_1"],
-    ("D", "B"): ["D_to_B_0", "D_to_B_1"],
-    ("C", "D"): ["C_to_D_0", "C_to_D_1"],
-    ("D", "C"): ["D_to_C_0", "D_to_C_1"]
-}
+from network.topology import ALLOWED_DIRECTED_EDGES, CORRIDOR_INCOMING_LANES
 
 
 class CausalInfluenceEstimator:

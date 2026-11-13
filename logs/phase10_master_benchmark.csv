@@ -1,0 +1,111 @@
+controller_id,controller_name,category,architecture,safety_enabled,seed,mean_delay,mean_queue,throughput,task_return,actual_comm,possible_comm,comm_ratio,comm_cost,action_keep_pct,action_switch_pct,action_extend_pct,action_reduce_pct,policy_entropy,total_interventions,min_green_enforced,max_green_enforced,min_red_enforced,yellow_clearance_clamps,all_red_clearance_clamps,physical_conflicts
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1001,160.445,15.18,105,-3817.3800000000006,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1002,135.7075,12.93,110,-3232.63,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1003,183.6675,16.92,105,-4351.429999999999,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1004,145.8075,14.14,114,-3483.03,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1005,151.975,14.1425,89,-3606.48,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1006,175.035,16.2525,121,-4152.08,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1007,146.05,13.6275,99,-3467.3799999999997,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1008,137.7825,13.35,113,-3290.93,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1009,140.695,13.2475,99,-3345.080000000001,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C1,Fixed-Time Baseline,Primary,Periodic 30s Green Rule-Based,False,1010,137.8775,13.045,111,-3280.63,0,800,0.0,0.0,84.0,16.0,0.0,0.0,0.0,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1001,34.1775,8.6725,112,-1034.4499999999998,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8729963673651219,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1002,24.17,6.4125,118,-743.9000000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8541959265619516,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1003,34.8375,9.715,109,-1089.3500000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.856925275400281,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1004,27.055,7.605,103,-849.3,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8649584059417248,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1005,27.905,7.785,107,-873.5,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8602589988708496,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1006,28.905,8.065,105,-904.7,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8625754383206368,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1007,26.905,7.4375,108,-839.5999999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8521514622867108,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1008,27.7625,7.5875,94,-862.75,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8610590344667435,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1009,26.495,7.2725,101,-824.8,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8641479384899139,0,0,0,0,0,0,0
+C2,Phase 3 IPPO,Primary,Decentralized IPPO MLP (43->64->64->4),False,1010,25.7875,7.04,89,-801.3499999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.8452059202641249,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1001,34.1775,8.6725,112,-1034.4499999999998,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5354343466460705,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1002,24.17,6.4125,118,-743.9000000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.49397307019680736,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1003,34.8375,9.715,109,-1089.3500000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5462181394919753,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1004,27.055,7.605,103,-849.3,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5177018250524997,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1005,27.905,7.785,107,-873.5,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5531049787253142,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1006,28.905,8.065,105,-904.7,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5294736531376839,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1007,26.905,7.4375,108,-839.5999999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5223257638886571,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1008,27.7625,7.5875,94,-862.75,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5073680553212762,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1009,26.495,7.2725,101,-824.8,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5103221248462796,0,0,0,0,0,0,0
+C3,Phase 4 MAPPO (Shared Policy),Primary,CTDE MAPPO Shared MLP (47->64->64->4),False,1010,25.7875,7.04,89,-801.3499999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.48703423261642453,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1001,95.2975,12.8375,94,-2422.0300000000007,0,800,0.0,0.0,32.25,43.75,17.5,6.5,1.202939023822546,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1002,109.1825,11.78,103,-2656.87,0,800,0.0,0.0,40.5,29.75,20.5,9.25,1.228487055748701,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1003,83.4975,12.9975,101,-2192.3100000000004,0,800,0.0,0.0,40.75,42.5,8.5,8.25,1.221822350025177,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1004,117.6575,13.7225,97,-2904.43,0,800,0.0,0.0,33.75,42.0,17.75,6.5,1.2155694638192653,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1005,104.555,12.1475,110,-2579.2,0,800,0.0,0.0,41.5,34.0,14.75,9.75,1.2219224393367767,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1006,92.28,11.83,111,-2321.1800000000007,0,800,0.0,0.0,39.75,40.0,12.0,8.25,1.212759989798069,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1007,78.3625,10.875,99,-2004.5100000000007,0,800,0.0,0.0,36.5,35.25,13.0,15.25,1.219885399490595,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1008,83.95,11.1025,103,-2125.4,0,800,0.0,0.0,39.5,36.5,15.25,8.75,1.2286003920435906,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1009,91.63,11.605,96,-2299.14,0,800,0.0,0.0,40.25,40.0,12.5,7.249999999999999,1.2141724129021167,0,0,0,0,0,0,0
+C4,Phase 5 Transformer-MAPPO,Primary,"Temporal Transformer (k=4, 43->64) + MLP (68->4)",False,1010,84.3775,11.0325,88,-2131.13,0,800,0.0,0.0,40.0,36.5,16.25,7.249999999999999,1.226020686030388,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1001,34.1775,8.6725,112,-1034.4499999999998,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248769271373748,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1002,24.17,6.4125,118,-743.9000000000001,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248734760284424,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1003,34.8375,9.715,109,-1089.3500000000001,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7247976678609848,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1004,27.055,7.605,103,-849.3,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248472350835801,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1005,27.905,7.785,107,-873.5,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248377192020417,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1006,28.905,8.065,105,-904.7,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248470520973206,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1007,26.905,7.4375,108,-839.5999999999999,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248490482568741,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1008,27.7625,7.5875,94,-862.75,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248496747016907,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1009,26.495,7.2725,101,-824.8,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248460984230042,0,0,0,0,0,0,0
+C5,Phase 6 GAT-MAPPO,Primary,Transformer (64) + Dense GAT (64) + MLP (68->4),False,1010,25.7875,7.04,89,-801.3499999999999,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.7248779582977295,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1001,34.1775,8.6725,112,-1034.4499999999998,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5087009096145629,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1002,24.17,6.4125,118,-743.9000000000001,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086519008874893,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1003,34.8375,9.715,109,-1089.3500000000001,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086955446004867,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1004,27.055,7.605,103,-849.3,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086724138259888,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1005,27.905,7.785,107,-873.5,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086653029918671,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1006,28.905,8.065,105,-904.7,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086884248256683,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1007,26.905,7.4375,108,-839.5999999999999,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086629658937454,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1008,27.7625,7.5875,94,-862.75,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086786592006683,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1009,26.495,7.2725,101,-824.8,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086660730838776,0,0,0,0,0,0,0
+C6,Phase 7 Comm-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Comm Gate + MLP (68->4),False,1010,25.7875,7.04,89,-801.3499999999999,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.5086762255430222,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1001,34.1775,8.6725,112,-1034.4499999999998,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168365108966828,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1002,24.17,6.4125,118,-743.9000000000001,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168170809745789,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1003,34.8375,9.715,109,-1089.3500000000001,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168459612131119,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1004,27.055,7.605,103,-849.3,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168284720182419,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1005,27.905,7.785,107,-873.5,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168020576238632,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1006,28.905,8.065,105,-904.7,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168170815706253,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1007,26.905,7.4375,108,-839.5999999999999,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168241685628891,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1008,27.7625,7.5875,94,-862.75,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168213033676148,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1009,26.495,7.2725,101,-824.8,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.616821655035019,0,0,0,0,0,0,0
+C7,Phase 8 Causal-Gated MAPPO,Primary,Transformer (64) + Gated GAT + Causal Gate + MLP (68->4),False,1010,25.7875,7.04,89,-801.3499999999999,800,800,1.0,8.0,0.0,100.0,0.0,0.0,0.6168147164583206,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1001,34.1775,8.6725,112,-1034.4499999999998,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9324152880907058,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1002,24.17,6.4125,118,-743.9000000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.932405230998993,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1003,34.8375,9.715,109,-1089.3500000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9321755123138428,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1004,27.055,7.605,103,-849.3,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9316982936859131,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1005,27.905,7.785,107,-873.5,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9320593136548996,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1006,28.905,8.065,105,-904.7,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9322961723804474,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1007,26.905,7.4375,108,-839.5999999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9320259797573089,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1008,27.7625,7.5875,94,-862.75,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.93350779235363,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1009,26.495,7.2725,101,-824.8,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9318897014856339,0,0,0,0,0,0,0
+C8,Phase 8R Causal Improved,Primary,Transformer (64) + Improved Gated GAT + phi(C_ij) + MLP (68->4),False,1010,25.7875,7.04,89,-801.3499999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9326939642429352,0,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1001,41.4575,10.0675,87,-1235.8500000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9333808660507202,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1002,32.135,8.28,94,-977.8999999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9320676916837692,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1003,44.19,11.6575,75,-1354.1000000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9323671221733093,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1004,38.82,10.0575,91,-1182.6999999999998,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9325522220134735,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1005,36.2675,9.3025,101,-1101.45,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9320662784576416,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1006,37.9425,9.77,99,-1153.6499999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.932659559249878,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1007,34.7725,8.8775,91,-1054.5500000000002,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9324308723211289,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1008,36.925,9.4625,79,-1121.0,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9329688864946365,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1009,33.9325,8.7825,94,-1033.95,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9316001445055008,200,0,0,0,0,0,0
+C9,Phase 9 Shielded (SAGE-Traffic),Primary,Phase 8R Architecture + Runtime Safety Shield,True,1010,35.02,8.86,84,-1058.8,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9333660209178924,200,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1001,34.1775,8.6725,112,-1034.4499999999998,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5354343466460705,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1002,24.17,6.4125,118,-743.9000000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.49397307019680736,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1003,34.8375,9.715,109,-1089.3500000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5462181394919753,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1004,27.055,7.605,103,-849.3,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5177018250524997,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1005,27.905,7.785,107,-873.5,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5531049787253142,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1006,28.905,8.065,105,-904.7,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5294736531376839,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1007,26.905,7.4375,108,-839.5999999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5223257638886571,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1008,27.7625,7.5875,94,-862.75,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5073680553212762,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1009,26.495,7.2725,101,-824.8,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.5103221248462796,0,0,0,0,0,0,0
+A1,Phase 4 Individual Actors,Ablation,MAPPO Individual Actor MLPs (47->64->64->4 per agent),False,1010,25.7875,7.04,89,-801.3499999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.48703423261642453,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1001,34.1775,8.6725,112,-1034.4499999999998,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9324152880907058,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1002,24.17,6.4125,118,-743.9000000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.932405230998993,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1003,34.8375,9.715,109,-1089.3500000000001,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9321755123138428,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1004,27.055,7.605,103,-849.3,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9316982936859131,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1005,27.905,7.785,107,-873.5,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9320593136548996,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1006,28.905,8.065,105,-904.7,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9322961723804474,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1007,26.905,7.4375,108,-839.5999999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9320259797573089,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1008,27.7625,7.5875,94,-862.75,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.93350779235363,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1009,26.495,7.2725,101,-824.8,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9318897014856339,0,0,0,0,0,0,0
+A2,Phase 9 Safety Disabled,Ablation,Phase 9 Deployment without Safety Shield,False,1010,25.7875,7.04,89,-801.3499999999999,0,800,0.0,0.0,0.0,100.0,0.0,0.0,0.9326939642429352,0,0,0,0,0,0,0

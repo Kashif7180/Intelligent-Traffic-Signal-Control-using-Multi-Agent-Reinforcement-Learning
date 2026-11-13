@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-11-13T22:28:33",
+  "step_latency_ms": {
+    "baseline": 23.432,
+    "optimized": 10.608,
+    "reduction_percent": 54.73
+  },
+  "query_overhead_ms": {
+    "baseline": 18.47,
+    "optimized": 6.093,
+    "reduction_percent": 67.01
+  },
+  "gui_step_latency_ms": {
+    "baseline": 36.917,
+    "optimized": 19.131,
+    "reduction_percent": 48.18
+  },
+  "steps_per_second": {
+    "baseline": 42.68,
+    "optimized": 94.27
+  },
+  "optimized_sumo": {
+    "mean_step_time_ms": 10.608,
+    "steps_per_second": 94.27,
+    "simulated_seconds_per_wall_second": 471.33,
+    "breakdown": {
+      "traci_advancement_and_physics_ms": 4.505,
+      "single_pass_metrics_query_ms": 6.041,
+      "reused_observation_generation_ms": 0.048,
+      "reused_reward_calculation_ms": 0.004,
+      "total_query_portions_ms": 6.093
+    }
+  },
+  "optimized_gui": {
+    "mean_gui_step_ms": 19.131,
+    "p50_ms": 18.643,
+    "p95_ms": 20.767
+  }
+}

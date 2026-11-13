@@ -7,6 +7,7 @@ and multi-objective delay + queue reward functions.
 
 import os
 import sys
+import shutil
 
 # Ensure SUMO_HOME is set before importing traci/sumolib
 if "SUMO_HOME" not in os.environ:
@@ -334,7 +335,8 @@ class TrafficSignal:
     def compute_observation(
         self,
         features: List[str],
-        norm_cfg: Dict[str, float]
+        norm_cfg: Dict[str, float],
+        metrics: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """
         Build normalized observation vector based on configured features.
@@ -349,7 +351,8 @@ class TrafficSignal:
         - phase_duration: normalized by max_phase_duration
         """
         obs_components = []
-        metrics = self.get_metrics()
+        if metrics is None:
+            metrics = self.get_metrics()
         lane_data = metrics["lane_details"]
 
         # 1. Per-lane features for each incoming lane
@@ -387,13 +390,14 @@ class TrafficSignal:
 
         return np.array(obs_components, dtype=np.float32)
 
-    def compute_reward(self, reward_cfg: Dict[str, float]) -> float:
+    def compute_reward(self, reward_cfg: Dict[str, float], metrics: Optional[Dict[str, Any]] = None) -> float:
         """
         Compute per-agent reward function:
         R_i = - (w_queue * Q_i + w_delay * W_i + w_switch * S_i)
         All coefficients loaded from config.yaml.
         """
-        metrics = self.get_metrics()
+        if metrics is None:
+            metrics = self.get_metrics()
         q = metrics["queue_length"]
         w = metrics["waiting_time"]
         s = 1.0 if metrics["switched"] else 0.0
@@ -547,8 +551,13 @@ class MultiAgentTrafficEnv:
         if demand_level is None:
             demand_level = self.demand_cfg.get("active_demand", "normal")
 
-        # Generate routes if needed
-        generate_routes(self.config_path, demand_level=demand_level, seed=seed)
+        # Generate routes if needed (supports options override for pre-generated/dynamic route files)
+        if options is not None and "route_file" in options:
+            shutil.copy(options["route_file"], self.rou_file)
+        elif options is not None and options.get("skip_route_generation", False):
+            pass
+        else:
+            generate_routes(self.config_path, demand_level=demand_level, seed=seed)
 
         sumo_bin = get_sumo_binary(self.gui)
         sumo_cmd = [
@@ -564,12 +573,25 @@ class MultiAgentTrafficEnv:
         if self.gui:
             sumo_cmd.extend(["--start", "--quit-on-end"])
 
+        # Handle Gymnasium options dictionary for per-episode safety mode selection
+        if options is not None and "safety_enabled" in options:
+            req_safety = bool(options["safety_enabled"])
+            self.safety_enabled = req_safety
+            self.safety_layer.enabled = req_safety
+            self.all_red_duration = int(self.safety_cfg.get("all_red_duration", 1)) if self.safety_enabled else 0
+            self._pending_safety_enabled = None
         # Check for pending safety toggle deferred to episode boundary
-        if self._pending_safety_enabled is not None:
+        elif self._pending_safety_enabled is not None:
             self.safety_enabled = self._pending_safety_enabled
             self.safety_layer.enabled = self._pending_safety_enabled
             self.all_red_duration = int(self.safety_cfg.get("all_red_duration", 1)) if self.safety_enabled else 0
             self._pending_safety_enabled = None
+        else:
+            # Strictly restore config.yaml default when safety_enabled not specified in options and no pending toggle
+            default_safety = bool(self.safety_cfg.get("enabled", True))
+            self.safety_enabled = default_safety
+            self.safety_layer.enabled = default_safety
+            self.all_red_duration = int(self.safety_cfg.get("all_red_duration", 1)) if default_safety else 0
 
         self.safety_layer.reset()
 
@@ -598,14 +620,23 @@ class MultiAgentTrafficEnv:
             sig.initialize_phase()
             self.signals[ts_id] = sig
 
-        observations = {
-            agent_id: self.signals[agent_id].compute_observation(self.features, self.normalization)
+        initial_metrics = {
+            agent_id: self.signals[agent_id].get_metrics()
             for agent_id in self.agents
         }
 
+        observations = {}
+        for agent_id in self.agents:
+            sig = self.signals[agent_id]
+            try:
+                obs = sig.compute_observation(self.features, self.normalization, metrics=initial_metrics[agent_id])
+            except TypeError:
+                obs = sig.compute_observation(self.features, self.normalization)
+            observations[agent_id] = obs
+
         infos = {
             agent_id: {
-                "metrics": self.signals[agent_id].get_metrics(),
+                "metrics": initial_metrics[agent_id],
                 "sim_time": traci.simulation.getTime() if (traci is not None and traci.isLoaded()) else 0.0,
                 "safety": self.safety_layer.get_statistics()
             }
@@ -669,12 +700,23 @@ class MultiAgentTrafficEnv:
 
         for agent_id in self.agents:
             sig = self.signals[agent_id]
-            observations[agent_id] = sig.compute_observation(self.features, self.normalization)
-            rewards[agent_id] = sig.compute_reward(self.reward_cfg)
+            agent_metrics = sig.get_metrics()
+            try:
+                obs = sig.compute_observation(self.features, self.normalization, metrics=agent_metrics)
+            except TypeError:
+                obs = sig.compute_observation(self.features, self.normalization)
+            observations[agent_id] = obs
+
+            try:
+                rew = sig.compute_reward(self.reward_cfg, metrics=agent_metrics)
+            except TypeError:
+                rew = sig.compute_reward(self.reward_cfg)
+            rewards[agent_id] = rew
+
             terminations[agent_id] = sim_ended
             truncations[agent_id] = truncated_flag
             infos[agent_id] = {
-                "metrics": sig.get_metrics(),
+                "metrics": agent_metrics,
                 "current_step": self.current_step,
                 "sim_time": traci.simulation.getTime() if (traci is not None and traci.isLoaded()) else float(self.current_step * self.step_duration),
                 "active_vehicles": traci.vehicle.getIDCount() if (traci is not None and traci.isLoaded()) else 0,

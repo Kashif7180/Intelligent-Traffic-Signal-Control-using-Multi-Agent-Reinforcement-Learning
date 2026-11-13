@@ -32,55 +32,23 @@ from torch.distributions.categorical import Categorical
 from typing import Dict, List, Tuple, Optional, Generator, Any
 
 from models.transformer_network import TemporalTransformerEncoder, TemporalHistoryManager, layer_init
+from network.topology import (
+    PHYSICAL_INTERSECTIONS,
+    ALLOWED_DIRECTED_EDGES,
+    build_physical_adjacency_list
+)
 
 
 def build_physical_adjacency_matrix(
-    agents: List[str] = ["A", "B", "C", "D"],
+    agents: List[str] = PHYSICAL_INTERSECTIONS,
     add_self_loops: bool = True
 ) -> torch.Tensor:
     """
     Build the adjacency matrix strictly from the physical road network.
-    
-    Road Topology (from network/build_network.py):
-    A: (0, 300)      B: (300, 300)
-    C: (0, 0)        D: (300, 0)
-    
-    Physical Bidirectional Edges:
-    - A <-> B (internal horizontal edge)
-    - A <-> C (internal vertical edge)
-    - B <-> D (internal vertical edge)
-    - C <-> D (internal horizontal edge)
-    
-    Diagonals A <-> D and B <-> C do NOT exist physically.
-    
-    Adjacency Matrix (row = target i, col = source j, message j -> i):
-    With self-loops:
-      A: [1, 1, 1, 0]  (self, B, C)
-      B: [1, 1, 0, 1]  (A, self, D)
-      C: [1, 0, 1, 1]  (A, self, D)
-      D: [0, 1, 1, 1]  (B, C, self)
+    Constructs a PyTorch tensor from the canonical network.topology adjacency definition.
     """
-    idx_map = {a: i for i, a in enumerate(agents)}
-    n = len(agents)
-    adj = torch.zeros((n, n), dtype=torch.float32)
-
-    # Physical road connections
-    physical_edges = [
-        ("A", "B"), ("B", "A"),
-        ("A", "C"), ("C", "A"),
-        ("B", "D"), ("D", "B"),
-        ("C", "D"), ("D", "C"),
-    ]
-
-    for u, v in physical_edges:
-        if u in idx_map and v in idx_map:
-            adj[idx_map[u], idx_map[v]] = 1.0
-
-    if add_self_loops:
-        for i in range(n):
-            adj[i, i] = 1.0
-
-    return adj
+    adj_list = build_physical_adjacency_list(agents=agents, add_self_loops=add_self_loops)
+    return torch.tensor(adj_list, dtype=torch.float32)
 
 
 class GraphAttentionLayer(nn.Module):

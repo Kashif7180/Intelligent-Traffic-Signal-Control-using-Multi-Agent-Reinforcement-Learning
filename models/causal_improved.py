@@ -27,8 +27,9 @@ from typing import Dict, List, Tuple, Optional, Any
 
 from models.transformer_network import TemporalTransformerEncoder, TemporalHistoryManager, layer_init
 from models.gat_network import build_physical_adjacency_matrix, DecentralizedGATActor, CentralizedGATCritic
-from models.causal_influence import CausalInfluenceEstimator, ALLOWED_DIRECTED_EDGES, CORRIDOR_INCOMING_LANES
+from models.causal_influence import CausalInfluenceEstimator
 from models.communication_gate import MAPPOGateRolloutBuffer
+from network.topology import ALLOWED_DIRECTED_EDGES, CORRIDOR_INCOMING_LANES
 
 
 class CausalPathwayEncoder(nn.Module):

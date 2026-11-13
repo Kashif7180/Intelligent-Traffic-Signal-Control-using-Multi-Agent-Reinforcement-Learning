@@ -38,15 +38,7 @@ from typing import Dict, List, Tuple, Optional, Generator, Any
 from models.transformer_network import TemporalTransformerEncoder, TemporalHistoryManager, layer_init
 from models.gat_network import build_physical_adjacency_matrix, DecentralizedGATActor, CentralizedGATCritic
 from models.causal_influence import CausalInfluenceEstimator
-
-
-# Exactly 8 allowed directed inter-agent communication edges
-ALLOWED_DIRECTED_EDGES = [
-    ("A", "B"), ("B", "A"),
-    ("A", "C"), ("C", "A"),
-    ("B", "D"), ("D", "B"),
-    ("C", "D"), ("D", "C")
-]
+from network.topology import ALLOWED_DIRECTED_EDGES
 
 
 class LearnableCommunicationGate(nn.Module):
