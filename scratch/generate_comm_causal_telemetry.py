@@ -107,7 +107,7 @@ ax4.grid(True, linestyle=":", alpha=0.3, color="#6c7086")
 ax4.legend(facecolor="#313244", edgecolor="#45475a", labelcolor="#cdd6f4")
 
 # Master Title
-plt.suptitle("SAGE-Traffic: Communication-Gate & Causal-Influence Telemetry (C8 / Phase 8R Architecture)", y=0.98, color="#cdd6f4")
+plt.suptitle("Intelligent Traffic Signal Control using Multi-Agent Reinforcement Learning\nCommunication-Gate & Causal-Influence Telemetry (Dual-Pathway Architecture)", y=0.98, color="#cdd6f4")
 
 os.makedirs("report_images", exist_ok=True)
 os.makedirs("plots", exist_ok=True)

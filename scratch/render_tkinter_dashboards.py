@@ -31,7 +31,7 @@ def render_unified_dashboard(output_path, show_xai_tab=False):
     ax_title = fig.add_axes([0, 0.96, 1, 0.04])
     ax_title.set_facecolor(THEME["surface"])
     ax_title.axis("off")
-    ax_title.text(0.012, 0.5, "SAGE-Traffic Phase 10: Unified Multi-Controller Dashboard & Architecture Validation", color=THEME["primary"], fontsize=9.5, fontweight="bold", fontfamily="Segoe UI", va="center")
+    ax_title.text(0.012, 0.5, "Intelligent Traffic Signal Control using Multi-Agent RL: Unified Multi-Controller Dashboard", color=THEME["primary"], fontsize=9.5, fontweight="bold", fontfamily="Segoe UI", va="center")
     ax_title.text(0.988, 0.5, "_   [ ]   X", color=THEME["subtext"], fontsize=9, fontweight="bold", ha="right", va="center")
     
     # 2. Top Controls Header Bar
@@ -39,12 +39,12 @@ def render_unified_dashboard(output_path, show_xai_tab=False):
     ax_header.set_facecolor(THEME["surface"])
     ax_header.axis("off")
     # Title badge
-    ax_header.text(0.015, 0.5, "SAGE-Traffic Phase 10", color=THEME["primary"], fontsize=11, fontweight="bold", fontfamily="Segoe UI", va="center")
+    ax_header.text(0.015, 0.5, "MARL Traffic Control", color=THEME["primary"], fontsize=11, fontweight="bold", fontfamily="Segoe UI", va="center")
     # Controller combobox
     ax_header.text(0.18, 0.5, "Controller:", color=THEME["subtext"], fontsize=8.5, fontweight="bold", va="center")
     rect_combo = patches.FancyBboxPatch((0.24, 0.15), 0.28, 0.70, boxstyle="round,pad=0.01", facecolor=THEME["card"], edgecolor=THEME["overlay"], lw=1.2)
     ax_header.add_patch(rect_combo)
-    ax_header.text(0.25, 0.5, "C9: Phase 9 Shielded (SAGE-Traffic Complete)  ▼", color=THEME["text"], fontsize=8.5, fontweight="bold", va="center")
+    ax_header.text(0.25, 0.5, "C9: Phase 9 Shielded (MARL Complete)  ▼", color=THEME["text"], fontsize=8.5, fontweight="bold", va="center")
     # Seed
     ax_header.text(0.535, 0.5, "Seed: [1001 ▼]", color=THEME["text"], fontsize=8.5, fontweight="bold", va="center", bbox=dict(boxstyle="round,pad=0.2", facecolor=THEME["card"], edgecolor=THEME["overlay"]))
     # Buttons
@@ -182,7 +182,7 @@ def render_unified_dashboard(output_path, show_xai_tab=False):
     if not show_xai_tab:
         # Render Tab 1: Architecture & Deep Telemetry
         ax_tabs.text(0.02, 0.82, "Controller Inference Pathway:", color=THEME["primary"], fontsize=9, fontweight="bold")
-        ax_tabs.text(0.02, 0.65, "Architecture: C9 Shielded SAGE-Traffic (Dual-Pathway Gated Attention + Safety Shield)\n"
+        ax_tabs.text(0.02, 0.65, "Architecture: C9 Shielded MARL Controller (Dual-Pathway Gated Attention + Safety Shield)\n"
                                  "• Temporal Transformer: k=4 historical decision steps [o(t-3), ..., o(t)] -> 64-D embedding\n"
                                  "• Dual-Pathway Gating: Learned Gate g_ij prunes quiet links | Causal Score phi(C_ij) amplifies critical corridors\n"
                                  "• Multi-Agent Coordination: Shared Actor MLP -> 4 synchronized discrete actions", color=THEME["text"], fontsize=8)

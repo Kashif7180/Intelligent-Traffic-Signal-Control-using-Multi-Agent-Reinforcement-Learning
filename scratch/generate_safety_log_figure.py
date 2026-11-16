@@ -136,3 +136,4 @@ plt.savefig("report_images/06_safety_intervention_log.png", dpi=300, facecolor=f
 plt.savefig("plots/06_safety_intervention_log.png", dpi=300, facecolor=fig.get_facecolor(), edgecolor="none")
 plt.close()
 print("Saved safety intervention log to report_images/06_safety_intervention_log.png and plots/")
+

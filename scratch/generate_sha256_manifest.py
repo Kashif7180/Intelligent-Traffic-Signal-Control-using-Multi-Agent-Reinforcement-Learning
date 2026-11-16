@@ -158,7 +158,7 @@ for (row, col), cell in tbl2.get_celld().items():
 
 ax2.set_title(f"SUMO Route Cache Manifest ({len(df_routes)} Pre-Generated Deterministic Route Files)", color="#89b4fa", fontsize=12, weight="bold", pad=12)
 
-plt.suptitle("SAGE-Traffic: Cryptographic SHA256 Integrity Verification Certificate", y=0.98, color="#cdd6f4", fontsize=14, weight="bold")
+plt.suptitle("Intelligent Traffic Signal Control using Multi-Agent Reinforcement Learning\nCryptographic SHA256 Integrity Verification Certificate", y=0.98, color="#cdd6f4", fontsize=13, weight="bold")
 
 os.makedirs("report_images", exist_ok=True)
 os.makedirs("plots", exist_ok=True)
@@ -166,3 +166,4 @@ plt.savefig("report_images/08_sha256_manifest.png", dpi=300, facecolor=fig.get_f
 plt.savefig("plots/08_sha256_manifest.png", dpi=300, facecolor=fig.get_facecolor(), edgecolor="none")
 plt.close()
 print("Saved SHA256 manifest to report_images/08_sha256_manifest.png and plots/")
+

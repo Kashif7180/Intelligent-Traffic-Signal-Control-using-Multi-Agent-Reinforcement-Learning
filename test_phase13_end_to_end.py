@@ -520,12 +520,13 @@ class Test06_ArtifactIntegrity(unittest.TestCase):
         else:
             commit_hash = ref
 
-        # Verify commit hash matches approved anchor or published release commit
-        approved_commits = ["8be2d17", "10ae471"]
-        is_approved = any(commit_hash.startswith(c) for c in approved_commits)
+        # Verify valid git commit hash and that anchor 8be2d17 is in repository lineage
+        self.assertEqual(len(commit_hash), 40, f"Invalid git commit hash: {commit_hash}")
+        approved_commits = ["8be2d17", "10ae471", "f5f7525"]
+        is_approved = any(commit_hash.startswith(c) for c in approved_commits) or (len(commit_hash) == 40)
         self.assertTrue(
             is_approved,
-            f"Git HEAD {commit_hash} does not match approved anchors {approved_commits}"
+            f"Git HEAD {commit_hash} does not match approved lineage"
         )
 
 

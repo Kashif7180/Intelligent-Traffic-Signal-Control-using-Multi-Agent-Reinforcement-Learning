@@ -88,3 +88,4 @@ print("[Capture] Saved: report_images/06_safety_intervention_log_dashboard.png")
 app.env.close()
 root.destroy()
 print("[Capture] Completed all Tkinter dashboard captures successfully!")
+

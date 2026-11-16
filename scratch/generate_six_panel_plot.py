@@ -134,7 +134,7 @@ for bar in b2:
     ax6.text(bar.get_x() + bar.get_width() / 2, h + 4, f"{int(h)}", ha="center", va="bottom", fontsize=8, fontweight="bold", color="darkred")
 
 # Polish layout
-plt.suptitle("SAGE-Traffic: Comprehensive 11-Controller Master Benchmark Evaluation (10-Seed Average)", y=0.98)
+plt.suptitle("Intelligent Traffic Signal Control using Multi-Agent Reinforcement Learning\nComprehensive 11-Controller Master Benchmark Evaluation (10-Seed Average)", y=0.98)
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 os.makedirs("report_images", exist_ok=True)
@@ -143,3 +143,4 @@ plt.savefig("report_images/07_six_panel_benchmark_comparison.png", dpi=300)
 plt.savefig("plots/07_six_panel_benchmark_comparison.png", dpi=300)
 plt.close()
 print("Saved 6-panel benchmark comparison to report_images/07_six_panel_benchmark_comparison.png and plots/")
+

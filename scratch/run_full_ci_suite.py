@@ -18,7 +18,7 @@ test_modules = [
 
 terminal_lines = [
     "==========================================================================================",
-    "              SAGE-TRAFFIC CONTINUOUS INTEGRATION & SYSTEM TEST REPORT                    ",
+    "   INTELLIGENT TRAFFIC SIGNAL CONTROL (MARL) CONTINUOUS INTEGRATION & TEST REPORT         ",
     "==========================================================================================",
     f"Host OS:        Windows 11 x64 (Build 22631)     | Python: 3.14.0",
     f"Environment:    Eclipse SUMO TraCI MultiAgent    | PyTorch: 2.10.0+cu128",
