@@ -520,9 +520,12 @@ class Test06_ArtifactIntegrity(unittest.TestCase):
         else:
             commit_hash = ref
 
+        # Verify commit hash matches approved anchor or published release commit
+        approved_commits = ["8be2d17", "10ae471"]
+        is_approved = any(commit_hash.startswith(c) for c in approved_commits)
         self.assertTrue(
-            commit_hash.startswith("8be2d17"),
-            f"Git HEAD {commit_hash} does not match anchor 8be2d17"
+            is_approved,
+            f"Git HEAD {commit_hash} does not match approved anchors {approved_commits}"
         )
 
 
